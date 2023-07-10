@@ -8,6 +8,54 @@ L2 = 0.11 # length of link 2
 TOLERANCE = 0.01 # tolerance for inverse kinematics
 PERTURBATION = 0.0001 # perturbation for finite difference method
 
+def fk_shoulder(joint_angles):
+  """
+  Use forward kinematics equations to calculate the xyz coordinates of the shoulder
+  joint given the joint angles of the robot
+
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    xyz coordinates of the shoulder joint in the arm frame. Numpy array of 3 elements [x, y, z]
+
+  """
+
+  shoulder_joint_xyz = np.array([0.0, 0.0, 0.0])
+  return shoulder_joint_xyz
+
+def fk_elbow(joint_angles):
+  """
+  Use forward kinematics equations to calculate the xyz coordinates of the elbow
+  joint given the joint angles of the robot
+
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    xyz coordinates of the elbow joint in the arm frame. Numpy array of 3 elements [x, y, z]
+
+  """
+
+  elbow_joint_xyz = np.array([0.0, 0.0, 0.1])
+  return elbow_joint_xyz
+
+def fk_foot(joint_angles):
+  """
+  Use forward kinematics equations to calculate the xyz coordinates of the foot given 
+  the joint angles of the robot
+
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    xyz coordinates of the foot in the arm frame. Numpy array of 3 elements [x, y, z]
+
+  """
+
+  foot_joint_xyz = np.array([0.0, 0.0, 0.2])
+  return foot_joint_xyz
+
 def calculate_forward_kinematics_robot(joint_angles):
     """Calculate xyz coordinates of end-effector given joint angles.
 
