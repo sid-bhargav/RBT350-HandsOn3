@@ -28,7 +28,11 @@ L2 = 0.11  # meters
 def main(argv):
   run_on_robot = FLAGS.run_on_robot
   reacher = reacher_sim_utils.load_reacher()
-  sphere_id = reacher_sim_utils.create_debug_sphere()
+
+  # Sphere markers for the students' FK solutions
+  shoulder_sphere_id = reacher_sim_utils.create_debug_sphere([1, 0, 0, 1])
+  elbow_sphere_id    = reacher_sim_utils.create_debug_sphere([0, 1, 0, 1])
+  foot_sphere_id     = reacher_sim_utils.create_debug_sphere([0, 0, 1, 1])
 
   joint_ids = reacher_sim_utils.get_joint_ids(reacher)
   param_ids = reacher_sim_utils.get_param_ids(reacher)
@@ -109,10 +113,14 @@ def main(argv):
         # Actuator positions are stored in array: hardware_interface.robot_state.position,
         # Actuator velocities are stored in array: hardware_interface.robot_state.velocity
 
+      shoulder_pos = reacher_kinematics.fk_shoulder(joint_angles[:3])
+      elbow_pos    = reacher_kinematics.fk_elbow(joint_angles[:3])
+      foot_pos     = reacher_kinematics.fk_foot(joint_angles[:3])
+
       end_effector_pos = reacher_kinematics.calculate_forward_kinematics_robot(joint_angles[:3])
-      p.resetBasePositionAndOrientation(sphere_id,
-                                        posObj=end_effector_pos,
-                                        ornObj=[0, 0, 0, 1])
+      p.resetBasePositionAndOrientation(shoulder_sphere_id, posObj=shoulder_pos, ornObj=[0, 0, 0, 1])
+      p.resetBasePositionAndOrientation(elbow_sphere_id   , posObj=elbow_pos   , ornObj=[0, 0, 0, 1])
+      p.resetBasePositionAndOrientation(foot_sphere_id    , posObj=foot_pos    , ornObj=[0, 0, 0, 1])
 
       if counter % 20 == 0:
         print("Joint angles:", joint_angles, "Position:", end_effector_pos)

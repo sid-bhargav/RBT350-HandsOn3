@@ -4,8 +4,8 @@ import reacher.data as pd
 import numpy as np
 import math
 
-def create_debug_sphere():
-  target_visual_shape = p.createVisualShape(p.GEOM_SPHERE, radius=0.015)
+def create_debug_sphere(color=np.array([0, 0, 0, 1])):
+  target_visual_shape = p.createVisualShape(p.GEOM_SPHERE, radius=0.015, rgbaColor=color)
   sphere_id = p.createMultiBody(baseVisualShapeIndex=target_visual_shape,
                                 basePosition=np.array([0, 0, 0]))
   return sphere_id
