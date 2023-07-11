@@ -18,7 +18,7 @@ If you already have the tools installed you'll get an error saying so, which you
 The PyBullet simulator requires Microsoft Visual C++ to compile on Windows. You can find the download link for the build tools [here](https://visualstudio.microsoft.com/visual-cpp-build-tools/). Once you have that installed, run the program and select the option for "Desktop development with C++". Leave all the "optional" downloads checked and download the packages. It will be quite a large download.
 
 ### Conda setup
-Install [miniconda](https://docs.conda.io/en/latest/miniconda.html). If you're on Windows, you will now need to open the Anaconda Prompt Terminal. Those on Linux and MacOS can just open a regular terminal. Run the following commands to create and activate the Conda environment.
+Now install [miniconda](https://docs.conda.io/en/latest/miniconda.html). Once that's done, create a conda environment for the project. If you're on Windows, you will now to open the Anaconda Prompt Terminal. Those on Linux and MacOS can just open a regular terminal. Run the following commands to create and activate the Conda environment.
 ```
 conda create --name reacher python=3.8
 conda activate reacher
