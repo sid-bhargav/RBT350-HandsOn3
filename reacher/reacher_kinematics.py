@@ -8,6 +8,32 @@ L2 = 0.11 # length of link 2
 TOLERANCE = 0.01 # tolerance for inverse kinematics
 PERTURBATION = 0.0001 # perturbation for finite difference method
 
+def rotation_matrix(axis, angle):
+  """
+  Create a 3x3 rotation matrix which rotates about a specific axis
+
+  Args:
+    axis:  String. One of either "x", "y" or "z". Represents the axis of rotation
+    angle: Number. The amount to rotate about the axis in radians
+
+  Returns:
+    3x3 rotation matrix as a numpy array
+  """
+
+  # Convert the axis to lowercase to allow uppercase inputs as well
+  axis = axis.lower()
+
+  if axis == "x":
+    rot_mat = np.array([[]])
+  elif axis == "y":
+    rot_mat = np.array([[]])
+  elif axis == "z":
+    rot_mat = np.array([[]])
+  else:
+    raise ValueError(f"Incorrect axis \"{axis}\" provided, cannot calculate rotation matrix")
+
+  return rot_mat
+
 def fk_shoulder(joint_angles):
   """
   Use forward kinematics equations to calculate the xyz coordinates of the shoulder
@@ -20,7 +46,7 @@ def fk_shoulder(joint_angles):
     xyz coordinates of the shoulder joint in the arm frame. Numpy array of 3 elements [x, y, z]
 
   """
-
+  print(rotation_matrix("test", 10))
   shoulder_joint_xyz = np.array([0.0, 0.0, 0.0])
   return shoulder_joint_xyz
 
