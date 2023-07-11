@@ -46,7 +46,7 @@ def fk_shoulder(joint_angles):
     xyz coordinates of the shoulder joint in the arm frame. Numpy array of 3 elements [x, y, z]
 
   """
-  print(rotation_matrix("test", 10))
+
   shoulder_joint_xyz = np.array([0.0, 0.0, 0.0])
   return shoulder_joint_xyz
 
