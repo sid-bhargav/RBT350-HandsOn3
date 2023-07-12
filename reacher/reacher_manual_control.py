@@ -113,16 +113,16 @@ def main(argv):
         # Actuator positions are stored in array: hardware_interface.robot_state.position,
         # Actuator velocities are stored in array: hardware_interface.robot_state.velocity
 
+      # Get the positions of each joint and the end effector
       shoulder_pos = reacher_kinematics.fk_shoulder(joint_angles[:3])
       elbow_pos    = reacher_kinematics.fk_elbow(joint_angles[:3])
       foot_pos     = reacher_kinematics.fk_foot(joint_angles[:3])
 
-      end_effector_pos = reacher_kinematics.calculate_forward_kinematics_robot(joint_angles[:3])
       p.resetBasePositionAndOrientation(shoulder_sphere_id, posObj=shoulder_pos, ornObj=[0, 0, 0, 1])
       p.resetBasePositionAndOrientation(elbow_sphere_id   , posObj=elbow_pos   , ornObj=[0, 0, 0, 1])
       p.resetBasePositionAndOrientation(foot_sphere_id    , posObj=foot_pos    , ornObj=[0, 0, 0, 1])
 
       if counter % 20 == 0:
-        print("Joint angles:", joint_angles, "Position:", end_effector_pos)
+        print(f"\rJoint angles: [{', '.join(f'{q: .3f}' for q in joint_angles[:3])}] | Position: ({', '.join(f'{p: .3f}' for p in foot_pos)})", end='')
 
 app.run(main)

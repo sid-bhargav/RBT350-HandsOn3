@@ -82,21 +82,6 @@ def fk_foot(joint_angles):
   foot_joint_xyz = np.array([0.15, 0.2, -0.1])  # remove this line when you write your solution
   return foot_joint_xyz
 
-def calculate_forward_kinematics_robot(joint_angles):
-    """Calculate xyz coordinates of end-effector given joint angles.
-
-    Use forward kinematics equations to calculate the xyz coordinates of the end-effector
-    given some joint angles.
-
-    Args:
-      joint_angles: numpy array of 3 elements [TODO names]. Numpy array of 3 elements.
-    Returns:
-      xyz coordinates of the end-effector in the arm frame. Numpy array of 3 elements.
-    """
-    # TODO for students: Implement this function. ~25-35 lines of code.
-    end_effector_xyz = np.array([0.0, 0.0, 0.0])
-    return end_effector_xyz
-
 def ik_cost(end_effector_pos, guess):
     """Calculates the inverse kinematics loss.
 
