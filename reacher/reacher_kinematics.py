@@ -47,7 +47,7 @@ def fk_shoulder(joint_angles):
 
   """
 
-  shoulder_joint_xyz = np.array([0.0, 0.0, 0.0])
+  shoulder_joint_xyz = np.array([0.15, 0.0, -0.1])  # remove this line when you write your solution
   return shoulder_joint_xyz
 
 def fk_elbow(joint_angles):
@@ -63,7 +63,7 @@ def fk_elbow(joint_angles):
 
   """
 
-  elbow_joint_xyz = np.array([0.0, 0.0, 0.1])
+  elbow_joint_xyz = np.array([0.15, 0.1, -0.1]) # remove this line when you write your solution
   return elbow_joint_xyz
 
 def fk_foot(joint_angles):
@@ -79,7 +79,7 @@ def fk_foot(joint_angles):
 
   """
 
-  foot_joint_xyz = np.array([0.0, 0.0, 0.2])
+  foot_joint_xyz = np.array([0.15, 0.2, -0.1])  # remove this line when you write your solution
   return foot_joint_xyz
 
 def calculate_forward_kinematics_robot(joint_angles):
