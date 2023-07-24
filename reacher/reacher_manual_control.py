@@ -1,4 +1,5 @@
-from reacher import reacher_kinematics
+from reacher import forward_kinematics
+from reacher import inverse_kinematics
 from reacher import reacher_robot_utils
 from reacher import reacher_sim_utils
 import pybullet as p
@@ -81,7 +82,7 @@ def main(argv):
           for i in range(len(param_ids), len(param_ids) + 3):
             xyz.append(p.readUserDebugParameter(i))
           xyz = np.asarray(xyz)
-          ret = reacher_kinematics.calculate_inverse_kinematics(xyz, joint_angles[:3])
+          ret = inverse_kinematics.calculate_inverse_kinematics(xyz, joint_angles[:3])
           if ret is None:
             enable = False
           else:
@@ -114,9 +115,9 @@ def main(argv):
         # Actuator velocities are stored in array: hardware_interface.robot_state.velocity
 
       # Get the positions of each joint and the end effector
-      shoulder_pos = reacher_kinematics.fk_shoulder(joint_angles[:3])
-      elbow_pos    = reacher_kinematics.fk_elbow(joint_angles[:3])
-      foot_pos     = reacher_kinematics.fk_foot(joint_angles[:3])
+      shoulder_pos = forward_kinematics.fk_shoulder(joint_angles[:3])
+      elbow_pos    = forward_kinematics.fk_elbow(joint_angles[:3])
+      foot_pos     = forward_kinematics.fk_foot(joint_angles[:3])
 
       p.resetBasePositionAndOrientation(shoulder_sphere_id, posObj=shoulder_pos, ornObj=[0, 0, 0, 1])
       p.resetBasePositionAndOrientation(elbow_sphere_id   , posObj=elbow_pos   , ornObj=[0, 0, 0, 1])
