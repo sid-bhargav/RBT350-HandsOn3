@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import copy
+from reacher import forward_kinematics
 
 HIP_OFFSET = 0.0335
 L1 = 0.08 # length of link 1
