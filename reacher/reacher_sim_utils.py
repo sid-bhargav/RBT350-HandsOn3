@@ -4,8 +4,8 @@ import reacher.data as pd
 import numpy as np
 import math
 
-def create_debug_sphere(color=np.array([0, 0, 0, 1])):
-  target_visual_shape = p.createVisualShape(p.GEOM_SPHERE, radius=0.020, rgbaColor=color)
+def create_debug_sphere(color=np.array([0, 0, 0, 1]), radius=0.02):
+  target_visual_shape = p.createVisualShape(p.GEOM_SPHERE, radius=radius, rgbaColor=color)
   sphere_id = p.createMultiBody(baseVisualShapeIndex=target_visual_shape,
                                 basePosition=np.array([0, 0, 0]))
   return sphere_id
@@ -37,21 +37,25 @@ def get_joint_ids(reacher_id):
   return joint_ids
 
 
-def get_param_ids(reacher_id):
+def get_param_ids(reacher_id, ik: bool = False):
   param_ids = []
-  for j in range(p.getNumJoints(reacher_id)):
-    info = p.getJointInfo(reacher_id, j)
-    joint_name = info[1]
-    joint_type = info[2]
-    if (joint_type == p.JOINT_PRISMATIC or joint_type == p.JOINT_REVOLUTE):
-      param_ids.append(
-          p.addUserDebugParameter(joint_name.decode("utf-8"), -math.pi, math.pi,
-                                  0))
 
-  axes = [' x', ' y', ' z']
-  vals = [.06, .03, .06]
-  for i in range(len(axes)):
-    p.addUserDebugParameter(axes[i], -.2, .2, vals[i])
+  if ik:
+    axes = [' x', ' y', ' z']
+    vals = [.06, .03, .06]
+    for i in range(len(axes)):
+        p.addUserDebugParameter(axes[i], -.2, .2, vals[i])
+
+  else:
+    for j in range(p.getNumJoints(reacher_id)):
+      info = p.getJointInfo(reacher_id, j)
+      joint_name = info[1]
+      joint_type = info[2]
+      if (joint_type == p.JOINT_PRISMATIC or joint_type == p.JOINT_REVOLUTE):
+        param_ids.append(
+            p.addUserDebugParameter(joint_name.decode("utf-8"), -math.pi, math.pi,
+                                    0))
+    
   return param_ids
 
 
