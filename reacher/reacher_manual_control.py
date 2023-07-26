@@ -34,9 +34,10 @@ def main(argv):
   shoulder_sphere_id = reacher_sim_utils.create_debug_sphere([1, 0, 0, 1])
   elbow_sphere_id    = reacher_sim_utils.create_debug_sphere([0, 1, 0, 1])
   foot_sphere_id     = reacher_sim_utils.create_debug_sphere([0, 0, 1, 1])
+  target_sphere_id   = reacher_sim_utils.create_debug_sphere([1, 1, 1, 1], radius=0.01)
 
   joint_ids = reacher_sim_utils.get_joint_ids(reacher)
-  param_ids = reacher_sim_utils.get_param_ids(reacher)
+  param_ids = reacher_sim_utils.get_param_ids(reacher, FLAGS.ik)
   reacher_sim_utils.zero_damping(reacher)
 
   p.setPhysicsEngineParameter(numSolverIterations=10)
@@ -79,8 +80,10 @@ def main(argv):
       # If IK is enabled, update joint angles based off of goal XYZ position
       if FLAGS.ik:
           xyz = []
-          for i in range(len(param_ids), len(param_ids) + 3):
+          for i in range(3):
             xyz.append(p.readUserDebugParameter(i))
+          p.resetBasePositionAndOrientation(target_sphere_id, posObj=xyz, ornObj=[0, 0, 0, 1])
+
           xyz = np.asarray(xyz)
           ret = inverse_kinematics.calculate_inverse_kinematics(xyz, joint_angles[:3])
           if ret is None:
