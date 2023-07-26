@@ -8,6 +8,7 @@ L1 = 0.08 # length of link 1
 L2 = 0.11 # length of link 2
 TOLERANCE = 0.01 # tolerance for inverse kinematics
 PERTURBATION = 0.0001 # perturbation for finite difference method
+MAX_ITERATIONS = 100
 
 def ik_cost(end_effector_pos, guess):
     """Calculates the inverse kinematics loss.
@@ -86,15 +87,11 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
 
     loss_gradient = np.array([0.0, 0.0, 0.0]) # initialize gradient
 
-    # remove this line when you write your loop
-    raise Exception("Loop termination condition not implemented yet.")
-    while loss > TOLERANCE:
+    iterations = 0
+    while loss > TOLERANCE and iterations < MAX_ITERATIONS:
         # 1. recompute loss
         # 2. use finite difference method to compute gradient of loss
         # 3. update joint angles using newtons method
-        break
-
-
-
+        iterations += 1
 
     return joint_angles
