@@ -5,7 +5,7 @@ Simulation and Reinforcement Learning for Reacher Robot
 ### Operating system requirements
 * Mac
 * Linux
-* Windows (untested, not recommended)
+* Windows
 
 ### Mac-only setup
 Install xcode command line tools.
