@@ -4,8 +4,15 @@ import numpy as np
 
 
 def get_serial_port():
+  print("Looking for Teensy in Serial device list...")
   for device in list_ports.grep(".*"):
-    if device.manufacturer == "Teensyduino":
+    VID = device.hwid[12:16]
+    PID = device.hwid[17:21]
+    print(f"VID is {VID} and PID is {PID}")
+    print(f"Manufacturer: {device.manufacturer}")
+    print(f"Device.device: {device.device}")
+    if VID == "16C0" and PID == "0483":
+      print(f"Teensy found on {device.device}")
       return device.device
 
 
