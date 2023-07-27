@@ -53,7 +53,7 @@ def get_param_ids(reacher_id, ik: bool = False):
       joint_type = info[2]
       if (joint_type == p.JOINT_PRISMATIC or joint_type == p.JOINT_REVOLUTE):
         param_ids.append(
-            p.addUserDebugParameter(joint_name.decode("utf-8"), -math.pi, math.pi,
+            p.addUserDebugParameter(joint_name.decode("utf-8"), -math.pi/2, math.pi/2,
                                     0))
     
   return param_ids
