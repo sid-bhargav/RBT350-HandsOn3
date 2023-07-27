@@ -110,8 +110,8 @@ def main(argv):
         # right_angles = [-joint_angles[5], joint_angles[4], -joint_angles[3]]
         left_angles = joint_angles[:3]
         right_angles = joint_angles[3:]
-        full_actions[:, 3] = left_angles
-        full_actions[:, 2] = right_angles
+        full_actions[:, 3] = right_angles
+        full_actions[:, 2] = left_angles
 
         hardware_interface.set_actuator_postions(full_actions)
         # Actuator positions are stored in array: hardware_interface.robot_state.position,
