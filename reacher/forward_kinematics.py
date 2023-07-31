@@ -34,6 +34,37 @@ def rotation_matrix(axis, angle):
 
   return rot_mat
 
+def homogenous_transformation_matrix(axis, angle, v_A):
+  """
+  Create a 4x4 transformation matrix which transforms from frame A to frame B
+
+  Args:
+    axis:  String. One of either "x", "y" or "z". Represents the axis of rotation
+    angle: Number. The amount to rotate about the axis in radians
+    v_A:   Vector. The vector translation from A to B defined in frame A
+
+  Returns:
+    4x4 transformation matrix as a numpy array
+  """
+
+  T = np.eye(4)
+  return T
+
+def fk_hip(joint_angles):
+  """
+  Use forward kinematics equations to calculate the xyz coordinates of the hip
+  frame given the joint angles of the robot
+
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    4x4 matrix representing the pose of the hip frame in the base frame
+  """
+
+  shoulder_joint_xyz = np.array([0.15, 0.0, -0.1])  # remove this line when you write your solution
+  return shoulder_joint_xyz
+
 def fk_shoulder(joint_angles):
   """
   Use forward kinematics equations to calculate the xyz coordinates of the shoulder
@@ -43,8 +74,7 @@ def fk_shoulder(joint_angles):
     joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
                   elbow_angle]. Angles are in radians
   Returns:
-    xyz coordinates of the shoulder joint in the arm frame. Numpy array of 3 elements [x, y, z]
-
+    4x4 matrix representing the pose of the shoulder frame in the base frame
   """
 
   shoulder_joint_xyz = np.array([0.15, 0.0, -0.1])  # remove this line when you write your solution
@@ -59,8 +89,7 @@ def fk_elbow(joint_angles):
     joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
                   elbow_angle]. Angles are in radians
   Returns:
-    xyz coordinates of the elbow joint in the arm frame. Numpy array of 3 elements [x, y, z]
-
+    4x4 matrix representing the pose of the elbow frame in the base frame
   """
 
   elbow_joint_xyz = np.array([0.15, 0.1, -0.1]) # remove this line when you write your solution
@@ -75,8 +104,7 @@ def fk_foot(joint_angles):
     joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
                   elbow_angle]. Angles are in radians
   Returns:
-    xyz coordinates of the foot in the arm frame. Numpy array of 3 elements [x, y, z]
-
+    4x4 matrix representing the pose of the end effector frame in the base frame
   """
 
   foot_joint_xyz = np.array([0.15, 0.2, -0.1])  # remove this line when you write your solution
