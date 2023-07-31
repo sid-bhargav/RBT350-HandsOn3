@@ -62,8 +62,8 @@ def fk_hip(joint_angles):
     4x4 matrix representing the pose of the hip frame in the base frame
   """
 
-  shoulder_joint_xyz = np.array([0.15, 0.0, -0.1])  # remove this line when you write your solution
-  return shoulder_joint_xyz
+  hip_frame = np.eye(4)  # remove this line when you write your solution
+  return hip_frame
 
 def fk_shoulder(joint_angles):
   """
@@ -77,8 +77,12 @@ def fk_shoulder(joint_angles):
     4x4 matrix representing the pose of the shoulder frame in the base frame
   """
 
-  shoulder_joint_xyz = np.array([0.15, 0.0, -0.1])  # remove this line when you write your solution
-  return shoulder_joint_xyz
+  # remove these lines when you write your solution
+  default_sphere_location = np.array([[0.15, 0.0, -0.1]])
+  shoulder_frame = np.block(
+    [[np.eye(3), default_sphere_location.T], 
+     [0, 0, 0, 1]])
+  return shoulder_frame
 
 def fk_elbow(joint_angles):
   """
@@ -92,8 +96,12 @@ def fk_elbow(joint_angles):
     4x4 matrix representing the pose of the elbow frame in the base frame
   """
 
-  elbow_joint_xyz = np.array([0.15, 0.1, -0.1]) # remove this line when you write your solution
-  return elbow_joint_xyz
+  # remove these lines when you write your solution
+  default_sphere_location = np.array([[0.15, 0.1, -0.1]])
+  elbow_frame = np.block(
+    [[np.eye(3), default_sphere_location.T], 
+     [0, 0, 0, 1]])
+  return elbow_frame
 
 def fk_foot(joint_angles):
   """
@@ -107,5 +115,9 @@ def fk_foot(joint_angles):
     4x4 matrix representing the pose of the end effector frame in the base frame
   """
 
-  foot_joint_xyz = np.array([0.15, 0.2, -0.1])  # remove this line when you write your solution
-  return foot_joint_xyz
+  # remove these lines when you write your solution
+  default_sphere_location = np.array([[0.15, 0.2, -0.1]])
+  end_effector_frame = np.block(
+    [[np.eye(3), default_sphere_location.T], 
+     [0, 0, 0, 1]])
+  return end_effector_frame
