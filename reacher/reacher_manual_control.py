@@ -56,17 +56,36 @@ def main(argv):
   enable = True
   joint_angles = np.zeros(6)
 
-  # Use this function to disable/enable certain motors. The first six elements
-  # determine activation of the motors attached to the front of the PCB, which
-  # are not used in this lab. The last six elements correspond to the activations
-  # of the motors attached to the back of the PCB, which you are using.
-  # The 7th element will correspond to the motor with ID=1, 8th element ID=2, etc
-  # hardware_interface.send_dict({"activations": [0, 0, 0, 0, 0, 0, x, x, x, x, x, x]})
+  # For switching between control modes on the robot
+  last_mode_toggle = time.time()
+  SIM_TO_REAL = 0
+  REAL_TO_SIM = 1
+  mode_names = ["Sim to Real", "Real to Sim"]
+  mode = REAL_TO_SIM
+  TOGGLE_BUFFER_TIME = 0.3 # seconds
 
-  while (1):
+  # Utility function for determining when the spacebar has been pressed down and released
+  def isSpacebarPressed() -> bool:
+    return (p.getKeyboardEvents().get(32, 0) & 0b100)
+
+  # Main loop
+  while (True):
+
+    # Check if we need to switch control modes
+    if time.time() - last_mode_toggle >= TOGGLE_BUFFER_TIME:
+      last_mode_toggle = time.time()
+      if (isSpacebarPressed()):
+        mode = 1 - mode
+
+    # If interfacing with the real robot, handle those communications now
     if run_on_robot:
       hardware_interface.read_incoming_data()
+      if (mode == SIM_TO_REAL):
+        hardware_interface.set_activations([0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0])
+      else:
+        hardware_interface.deactivate()
 
+    # Control loop
     if time.time() - last_command > UPDATE_DT:
       last_command = time.time()
       counter += 1
@@ -93,40 +112,48 @@ def main(argv):
             joint_angles[:3] = np.arctan2(np.sin(ret), np.cos(ret))
             joint_angles[3:] = slider_angles[3:]
             enable = True
-      else:
+      elif mode == SIM_TO_REAL:
         joint_angles = slider_angles
+      else:
+        joint_angles = hardware_interface.robot_state.position[6:9]
+        pass
 
-      for i in range(len(joint_ids)):
-        p.setJointMotorControl2(reacher,
-                                joint_ids[i],
-                                p.POSITION_CONTROL,
-                                joint_angles[i],
-                                force=2.)
+      # Set the simulated robot to match the joint angles
+      for idx, joint_id in enumerate(joint_ids):
+        p.setJointMotorControl2(
+          reacher,
+          joint_id,
+          p.POSITION_CONTROL,
+          joint_angles[idx],
+          force=2.
+        )
 
+      # Set the robot angles to match the joint angles
       if run_on_robot and enable:
         full_actions = np.zeros([3, 4])
         # TODO: Update order & signs for your own robot/motor configuration like below
         # left_angles = [-joint_angles[1], -joint_angles[0], joint_angles[2]]
-        # right_angles = [-joint_angles[5], joint_angles[4], -joint_angles[3]]
         left_angles = joint_angles[:3]
-        right_angles = joint_angles[3:]
-        full_actions[:, 3] = right_angles
         full_actions[:, 2] = left_angles
 
         hardware_interface.set_actuator_postions(full_actions)
-        # Actuator positions are stored in array: hardware_interface.robot_state.position,
-        # Actuator velocities are stored in array: hardware_interface.robot_state.velocity
 
       # Get the positions of each joint and the end effector
-      shoulder_pos = forward_kinematics.fk_shoulder(joint_angles[:3])
-      elbow_pos    = forward_kinematics.fk_elbow(joint_angles[:3])
-      foot_pos     = forward_kinematics.fk_foot(joint_angles[:3])
+      shoulder_pos = forward_kinematics.fk_shoulder(joint_angles[:3])[:3,3]
+      elbow_pos    = forward_kinematics.fk_elbow(joint_angles[:3])[:3,3]
+      foot_pos     = forward_kinematics.fk_foot(joint_angles[:3])[:3,3]
 
+      # Show the bebug spheres for FK
       p.resetBasePositionAndOrientation(shoulder_sphere_id, posObj=shoulder_pos, ornObj=[0, 0, 0, 1])
       p.resetBasePositionAndOrientation(elbow_sphere_id   , posObj=elbow_pos   , ornObj=[0, 0, 0, 1])
       p.resetBasePositionAndOrientation(foot_sphere_id    , posObj=foot_pos    , ornObj=[0, 0, 0, 1])
 
+      # No, you cannot use this as your Hands-On 3 solution. You have to calculate it yourself
+      if (mode == REAL_TO_SIM):
+        (_, _, _, _, foot_pos, _) = p.getLinkState(reacher, 3, computeForwardKinematics = True)
+
+      # Show the result in the terminal
       if counter % 20 == 0:
-        print(f"\rJoint angles: [{', '.join(f'{q: .3f}' for q in joint_angles[:3])}] | Position: ({', '.join(f'{p: .3f}' for p in foot_pos)})", end='')
+        print(f"\r[MODE = {mode_names[mode]}] | Joint angles: [{', '.join(f'{q: .3f}' for q in joint_angles[:3])}] | Position: ({', '.join(f'{p: .3f}' for p in foot_pos)})", end='')
 
 app.run(main)
