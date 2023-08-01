@@ -1,5 +1,6 @@
 from serial.tools import list_ports
 import time
+import sys
 import numpy as np
 
 
@@ -14,6 +15,9 @@ def get_serial_port():
     if VID == "16C0" and PID == "0483":
       print(f"Teensy found on {device.device}")
       return device.device
+    
+  print("\n", "-"*100, "\n No Teensy device detected connected to the computer when 'run_on_robot' is enabled, shutting down\n", "-"*100, "\n")
+  sys.exit(1)
 
 
 def blocking_move(hardware_interface,
