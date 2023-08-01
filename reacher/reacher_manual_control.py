@@ -35,7 +35,6 @@ def main(argv):
   elbow_sphere_id    = reacher_sim_utils.create_debug_sphere([0, 1, 0, 1])
   foot_sphere_id     = reacher_sim_utils.create_debug_sphere([0, 0, 1, 1])
   target_sphere_id   = reacher_sim_utils.create_debug_sphere([1, 1, 1, 1], radius=0.01)
-  mode_label_id      = p.addUserDebugText("Mode = Real to Sim", [-0.1, -0.1, 0.3])
 
   joint_ids = reacher_sim_utils.get_joint_ids(reacher)
   param_ids = reacher_sim_utils.get_param_ids(reacher, FLAGS.ik)
@@ -44,6 +43,7 @@ def main(argv):
   p.setPhysicsEngineParameter(numSolverIterations=10)
 
   if run_on_robot:
+    mode_label_id = p.addUserDebugText("Mode = Real to Sim", [-0.1, -0.1, 0.3])
     serial_port = reacher_robot_utils.get_serial_port()
     hardware_interface = interface.Interface(serial_port)
     time.sleep(0.25)
@@ -62,7 +62,7 @@ def main(argv):
   SIM_TO_REAL = 0
   REAL_TO_SIM = 1
   mode_names = ["Sim to Real", "Real to Sim"]
-  mode = REAL_TO_SIM
+  mode = SIM_TO_REAL
   TOGGLE_BUFFER_TIME = 0.3 # seconds
 
   # Utility function for determining when the spacebar has been pressed down and released
@@ -73,7 +73,7 @@ def main(argv):
   while (True):
 
     # Check if we need to switch control modes
-    if time.time() - last_mode_toggle >= TOGGLE_BUFFER_TIME:
+    if run_on_robot and time.time() - last_mode_toggle >= TOGGLE_BUFFER_TIME:
       last_mode_toggle = time.time()
       if (isSpacebarPressed()):
         mode = 1 - mode
@@ -87,6 +87,14 @@ def main(argv):
         hardware_interface.set_activations([0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0])
       else:
         hardware_interface.deactivate()
+
+      # Check if we need to switch control modes
+      if time.time() - last_mode_toggle >= TOGGLE_BUFFER_TIME:
+        last_mode_toggle = time.time()
+        if (isSpacebarPressed()):
+          mode = 1 - mode
+          p.removeUserDebugItem(mode_label_id)
+          mode_label_id = p.addUserDebugText(f"Mode = {mode_names[mode]}", [-0.1, -0.1, 0.3])
 
     # Control loop
     if time.time() - last_command > UPDATE_DT:
@@ -117,9 +125,8 @@ def main(argv):
             enable = True
       elif mode == SIM_TO_REAL:
         joint_angles = slider_angles
-      elif run_on_robot:
+      else:
         joint_angles = hardware_interface.robot_state.position[6:9]
-        pass
 
       # Set the simulated robot to match the joint angles
       for idx, joint_id in enumerate(joint_ids):
