@@ -35,6 +35,7 @@ def main(argv):
   elbow_sphere_id    = reacher_sim_utils.create_debug_sphere([0, 1, 0, 1])
   foot_sphere_id     = reacher_sim_utils.create_debug_sphere([0, 0, 1, 1])
   target_sphere_id   = reacher_sim_utils.create_debug_sphere([1, 1, 1, 1], radius=0.01)
+  mode_label_id      = p.addUserDebugText("Mode = Real to Sim", [-0.1, -0.1, 0.3])
 
   joint_ids = reacher_sim_utils.get_joint_ids(reacher)
   param_ids = reacher_sim_utils.get_param_ids(reacher, FLAGS.ik)
@@ -76,6 +77,8 @@ def main(argv):
       last_mode_toggle = time.time()
       if (isSpacebarPressed()):
         mode = 1 - mode
+        p.removeUserDebugItem(mode_label_id)
+        mode_label_id = p.addUserDebugText(f"Mode = {mode_names[mode]}", [-0.1, -0.1, 0.3])
 
     # If interfacing with the real robot, handle those communications now
     if run_on_robot:
@@ -114,7 +117,7 @@ def main(argv):
             enable = True
       elif mode == SIM_TO_REAL:
         joint_angles = slider_angles
-      else:
+      elif run_on_robot:
         joint_angles = hardware_interface.robot_state.position[6:9]
         pass
 
