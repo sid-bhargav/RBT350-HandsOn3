@@ -37,14 +37,14 @@ def get_joint_ids(reacher_id):
   return joint_ids
 
 
-def get_param_ids(reacher_id, ik: bool = False):
+def get_param_ids(reacher_id, ik: bool = False, exploration: bool = False):
   param_ids = []
 
-  if ik:
+  if ik or exploration:
     axes = [' x', ' y', ' z']
     vals = [.06, .03, .06]
     for i in range(len(axes)):
-        p.addUserDebugParameter(axes[i], -.2, .2, vals[i])
+        param_ids.append(p.addUserDebugParameter(axes[i], -.2, .2, vals[i]))
 
   else:
     for j in range(p.getNumJoints(reacher_id)):
