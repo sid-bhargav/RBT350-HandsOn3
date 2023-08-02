@@ -86,6 +86,9 @@ def main(argv):
       hardware_interface.read_incoming_data()
       checkEnableMotors()
 
+    # Determine the direction of data transfer
+    real_to_sim = not motor_enabled and run_on_robot
+
     # Control loop
     if time.time() - last_command > UPDATE_DT:
       last_command = time.time()
@@ -109,7 +112,7 @@ def main(argv):
             joint_angles = np.arctan2(np.sin(ret), np.cos(ret))
 
       # If real-to-sim, update the joint angles based on the actual robot joint angles
-      if not motor_enabled and run_on_robot:
+      if real_to_sim:
         joint_angles = hardware_interface.robot_state.position[6:9]
         joint_angles[0] *= -1
 
@@ -125,9 +128,9 @@ def main(argv):
 
       # Set the robot angles to match the joint angles
       if run_on_robot and enable:
-        joint_angles[0] *= -1
         full_actions = np.zeros([3, 4])
         full_actions[:, 2] = joint_angles
+        full_actions[0, 2] *= -1
 
         # Prevent set_actuator_positions from printing to the console
         with contextlib.redirect_stdout(None):
