@@ -4,16 +4,16 @@ from reacher import reacher_robot_utils
 from reacher import reacher_sim_utils
 import pybullet as p
 import time
+import contextlib
 import numpy as np
 from absl import app
 from absl import flags
 from pupper_hardware_interface import interface
 from sys import platform
 
-flags.DEFINE_bool("run_on_robot", False,
-                  "Whether to run on robot or in simulation.")
-flags.DEFINE_bool("ik", False, "Whether to control arms through cartesian coordinates(IK) or joint angles")
-flags.DEFINE_bool("exploration", False, "Mode to have a target cartesian sphere and real-to-sim control")
+flags.DEFINE_bool("run_on_robot", False, "Whether to run on robot or in simulation.")
+flags.DEFINE_bool("ik"          , False, "Whether to control arms through cartesian coordinates(IK) or joint angles")
+flags.DEFINE_bool("exploration" , False, "Mode to have a target cartesian sphere and real-to-sim control")
 FLAGS = flags.FLAGS
 
 KP = 5.0  # Amps/rad
@@ -101,6 +101,7 @@ def main(argv):
       # If exploring, update the joint angles based on the actual robot joint angles
       elif FLAGS.exploration and run_on_robot:
         joint_angles = hardware_interface.robot_state.position[6:9]
+        joint_angles[0] *= -1
         enable = False
 
       # Set the simulated robot to match the joint angles
@@ -116,12 +117,11 @@ def main(argv):
       # Set the robot angles to match the joint angles
       if run_on_robot and enable:
         full_actions = np.zeros([3, 4])
-        # TODO: Update order & signs for your own robot/motor configuration like below
-        # left_angles = [-joint_angles[1], -joint_angles[0], joint_angles[2]]
-        left_angles = joint_angles
-        full_actions[:, 2] = left_angles
+        full_actions[:, 2] = -1*joint_angles
 
-        hardware_interface.set_actuator_postions(full_actions)
+        # Prevent set_actuator_positions from printing to the console
+        with contextlib.redirect_stdout(None):
+          hardware_interface.set_actuator_postions(full_actions)
 
       # Get the calculated positions of each joint and the end effector
       shoulder_pos = forward_kinematics.fk_shoulder(joint_angles[:3])[:3,3]
