@@ -50,8 +50,7 @@ def main(argv):
     time.sleep(0.25)
     hardware_interface.set_joint_space_parameters(kp=KP, kd=KD, max_current=MAX_CURRENT)
     # In exploration mode, we move the motors by hand
-    if FLAGS.exploration: 
-      hardware_interface.deactivate()
+    hardware_interface.deactivate()
 
   # Determine the type of control mode
   if not run_on_robot:
@@ -60,6 +59,24 @@ def main(argv):
     label = "REAL_TO_SIM"
   else:
     label = "SIM_TO_REAL"
+
+  # Whether or not the motors are enabled
+  motor_enabled = False
+  mode_text_id = p.addUserDebugText(f"Motor Enabled: {motor_enabled}", [0, 0, 0.2])
+  def checkEnableMotors():
+    nonlocal motor_enabled, mode_text_id
+    if FLAGS.exploration or not run_on_robot:
+      return
+    
+    # If spacebar (key 32) is pressed and released (0b100 mask), then toggle motors on or off
+    if p.getKeyboardEvents().get(32, 0) & 0b100:
+      motor_enabled = not motor_enabled
+      if motor_enabled:
+        hardware_interface.set_activations([0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0])
+      else:
+        hardware_interface.deactivate()
+      p.removeUserDebugItem(mode_text_id)
+      mode_text_id = p.addUserDebugText(f"Motor Enabled: {motor_enabled}", [0, 0, 0.2])
 
   # Control Loop Variables
   p.setRealTimeSimulation(1)
@@ -74,6 +91,7 @@ def main(argv):
     # If interfacing with the real robot, handle those communications now
     if run_on_robot:
       hardware_interface.read_incoming_data()
+      checkEnableMotors()
 
     # Control loop
     if time.time() - last_command > UPDATE_DT:
