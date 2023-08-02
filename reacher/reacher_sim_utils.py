@@ -37,10 +37,10 @@ def get_joint_ids(reacher_id):
   return joint_ids
 
 
-def get_param_ids(reacher_id, ik: bool = False, exploration: bool = False):
+def get_param_ids(reacher_id, ik: bool = False):
   param_ids = []
 
-  if ik or exploration:
+  if ik:
     axes = [' x', ' y', ' z']
     vals = [.06, .03, .06]
     for i in range(len(axes)):
