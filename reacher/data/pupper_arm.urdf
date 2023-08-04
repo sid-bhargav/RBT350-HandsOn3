@@ -69,8 +69,8 @@
         <geometry>
           <sphere radius="0.01"/>
         </geometry>
-        <material name="red">
-          <color rgba="1.00000 .100000 .100000 1.00000" />
+        <material name="gray">
+          <color rgba=".80000 .800000 .800000 1.00000" />
         </material>
 		  </visual>
       <collision name="Sphere.003">
