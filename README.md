@@ -18,7 +18,7 @@ If you already have the tools installed you'll get an error saying so, which you
 The PyBullet simulator requires Microsoft Visual C++ to compile on Windows. You can find the download link for the build tools [here](https://visualstudio.microsoft.com/visual-cpp-build-tools/). Once you have that installed, run the program and select the option for "Desktop development with C++". Leave all the "optional" downloads checked and download the packages. It will be quite a large download.
 
 ### Conda setup
-Now install [miniconda](https://docs.conda.io/en/latest/miniconda.html). Once that's done, create a conda environment for the project. If you're on Windows, you will now to open the Anaconda Prompt Terminal. Those on Linux and MacOS can just open a regular terminal. Run the following commands to create and activate the Conda environment.
+Now install miniconda through [this link](https://docs.conda.io/en/latest/miniconda.html). Once that's done, create a conda environment for the project by running the terminal commands below. If you're on Windows, you will need to do this in the Anaconda Prompt Terminal. Those on Linux and MacOS can run the commands in a regular terminal. 
 ```
 conda create --name reacher python=3.8
 conda activate reacher
@@ -26,8 +26,8 @@ pip install ray arspb
 ```
 
 ## Getting the code ready
+If you followed along with the instructions in Hands-On 3, you should have already cloned this repo to your computer. Navigation to the reacher-lab folder and run the following commands to install the dependencies for the simulator.
 ```bash
-git clone https://github.com/stanfordroboticsclub/reacher-lab.git
 cd reacher-lab
 pip install -e .
 ```
@@ -46,9 +46,9 @@ Assuming you have implemented all the functions inside of `reacher_kinematics.py
 
 ## Deploying to robot
 ### Upload reacher lab firmware to Teensy
-1. Open vscode and upload your lab 1 / 2 code. The Teensy application should open in the background.
+1. Open vscode and upload a stable version of your Hands-On 2 code. This is just to get the Teensy application to open in the background.
 
-2. Click the open hex file button in the application window (left side) and choose the `firmware.hex` THAT'S IN THIS FOLDER (not from the lab 1/2 code).
+2. Click the "open hex file" button in the application window (left side) and choose the `firmware.hex` THAT'S IN THIS FOLDER (not from your Hands-On 2 code).
 
 3. Click the green auto button if it's not already highlighted
 
