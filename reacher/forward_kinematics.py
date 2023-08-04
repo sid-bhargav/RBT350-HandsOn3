@@ -13,15 +13,12 @@ def rotation_matrix(axis, angle):
   Create a 3x3 rotation matrix which rotates about a specific axis
 
   Args:
-    axis:  String. One of either "x", "y" or "z". Represents the axis of rotation
+    axis:  Array.  Unit vector in the direction of the axis of rotation
     angle: Number. The amount to rotate about the axis in radians
 
   Returns:
     3x3 rotation matrix as a numpy array
   """
-
-  # Convert the axis to lowercase to allow uppercase inputs as well
-  axis = axis.lower()
 
   if axis == "x":
     rot_mat = np.array([[]])
@@ -39,7 +36,7 @@ def homogenous_transformation_matrix(axis, angle, v_A):
   Create a 4x4 transformation matrix which transforms from frame A to frame B
 
   Args:
-    axis:  String. One of either "x", "y" or "z". Represents the axis of rotation
+    axis:  Array.  Unit vector in the direction of the axis of rotation
     angle: Number. The amount to rotate about the axis in radians
     v_A:   Vector. The vector translation from A to B defined in frame A
 
