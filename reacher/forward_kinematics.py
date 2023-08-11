@@ -3,10 +3,8 @@ import numpy as np
 import copy
 
 HIP_OFFSET = 0.0335
-L1 = 0.08 # length of link 1
-L2 = 0.11 # length of link 2
-TOLERANCE = 0.01 # tolerance for inverse kinematics
-PERTURBATION = 0.0001 # perturbation for finite difference method
+UPPER_LEG_OFFSET = 0.10 # length of link 1
+LOWER_LEG_OFFSET = 0.13 # length of link 2
 
 def rotation_matrix(axis, angle):
   """
