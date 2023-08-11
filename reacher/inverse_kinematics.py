@@ -4,8 +4,8 @@ import copy
 from reacher import forward_kinematics
 
 HIP_OFFSET = 0.0335
-L1 = 0.08 # length of link 1
-L2 = 0.11 # length of link 2
+UPPER_LEG_OFFSET = 0.10 # length of link 1
+LOWER_LEG_OFFSET = 0.13 # length of link 2
 TOLERANCE = 0.01 # tolerance for inverse kinematics
 PERTURBATION = 0.0001 # perturbation for finite difference method
 MAX_ITERATIONS = 100
