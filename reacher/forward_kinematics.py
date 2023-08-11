@@ -18,15 +18,7 @@ def rotation_matrix(axis, angle):
     3x3 rotation matrix as a numpy array
   """
 
-  if axis == "x":
-    rot_mat = np.array([[]])
-  elif axis == "y":
-    rot_mat = np.array([[]])
-  elif axis == "z":
-    rot_mat = np.array([[]])
-  else:
-    raise ValueError(f"Incorrect axis \"{axis}\" provided, cannot calculate rotation matrix")
-
+  rot_mat = np.eye(3)
   return rot_mat
 
 def homogenous_transformation_matrix(axis, angle, v_A):
