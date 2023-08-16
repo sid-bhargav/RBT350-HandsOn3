@@ -111,6 +111,12 @@ def main(argv):
             # Wraps angles between -pi, pi
             joint_angles = np.arctan2(np.sin(ret), np.cos(ret))
 
+            # Double check that the angles are a correct solution before sending anything to the real robot
+            pos = forward_kinematics.fk_foot(joint_angles[:3])[:3,3]
+            if np.linalg.norm(np.asarray(pos) - xyz) > 0.01:
+              joint_angles = np.zeros_like(joint_angles)
+              print("Prevented operation on real robot as inverse kinematics solution was not correct")
+
       # If real-to-sim, update the joint angles based on the actual robot joint angles
       if real_to_sim:
         joint_angles = hardware_interface.robot_state.position[6:9]
