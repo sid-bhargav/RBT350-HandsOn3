@@ -28,7 +28,7 @@ pip install ray arspb
 ## Getting the code ready
 If you followed along with the instructions in Hands-On 3, you should have already cloned this repo to your computer. Navigation to the reacher-lab folder and run the following commands to install the dependencies for the simulator.
 ```bash
-cd reacher-lab
+cd RBT350-HandsOn3  
 pip install -e .
 ```
 
