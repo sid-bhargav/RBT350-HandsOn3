@@ -8,90 +8,87 @@ UPPER_LEG_OFFSET = 0.10 # length of link 1
 LOWER_LEG_OFFSET = 0.13 # length of link 2
 TOLERANCE = 0.01 # tolerance for inverse kinematics
 PERTURBATION = 0.0001 # perturbation for finite difference method
-MAX_ITERATIONS = 100
+MAX_ITERATIONS = 10
 
 def ik_cost(end_effector_pos, guess):
-    """Calculates the inverse kinematics loss.
+    """Calculates the inverse kinematics cost.
 
-    Calculate the Euclidean distance between the desired end-effector position and
-    the end-effector position resulting from the given 'guess' joint angles.
+    This function computes the inverse kinematics cost, which represents the Euclidean
+    distance between the desired end-effector position and the end-effector position
+    resulting from the provided 'guess' joint angles.
 
     Args:
-      end_effector_pos: desired xyz coordinates of end-effector. Numpy array of 3 elements.
-      guess: guess at joint angles to achieve desired end-effector position. Numpy array of 3 elements.
+        end_effector_pos (numpy.ndarray), (3,): The desired XYZ coordinates of the end-effector.
+            A numpy array with 3 elements.
+        guess (numpy.ndarray), (3,): A guess at the joint angles to achieve the desired end-effector
+            position. A numpy array with 3 elements.
+
     Returns:
-      Euclidean distance between end_effector_pos and guess. Returns float.
+        float: The Euclidean distance between end_effector_pos and the calculated end-effector
+        position based on the guess.
     """
-    # TODO for students: Implement this function. ~1-5 lines of code.
+    # Initialize cost to zero
     cost = 0.0
-    raise cost
 
-# write a function that uses newtons method to update the joint angles
-def newtons(guess, gradient):
-    """Update joint angles using a single step of Newton's method.
+    # Add your solution here.
+
+    return cost
+
+def calculate_jacobian_FD(joint_angles, delta):
+    """
+    Calculate the Jacobian matrix using finite differences.
+
+    This function computes the Jacobian matrix for a given set of joint angles using finite differences.
 
     Args:
-      guess: guess at joint angles to achieve desired end-effector position. Numpy array of 3 elements.
-      gradient: gradient of the loss function with respect to the joint angles. Numpy array of 3 elements.
+        joint_angles (numpy.ndarray), (3,): The current joint angles. A numpy array with 3 elements.
+        delta (float): The perturbation value used to approximate the partial derivatives.
+
     Returns:
-      updated_guess. Numpy array of 3 elements.
+        numpy.ndarray: The Jacobian matrix. A 3x3 numpy array representing the linear mapping
+        between joint velocity and end-effector linear velocity.
     """
-    # TODO for students: Implement this function. ~1-5 lines of code.
-    updated_guess = np.array([0.0, 0.0, 0.0])
-    return updated_guess
 
-# write a function that uses finite difference method to compute the gradient of the loss function
-def finite_difference(end_effector_pos, guess):
-    """Calculate the gradient of the loss function using finite difference method.
+    # Initialize Jacobian to zero
+    J = np.zeros((3, 3))
 
-    1. Calculate the loss function at the given guess
-    2. Calculate the loss function at a guess that is slightly perturbed in each direction by PERTURBATION (defined above)
-    3. Calculate the gradient using the finite difference method
+    # Add your solution here.
 
-    Args:
-      end_effector_pos: desired xyz coordinates of end-effector. Numpy array of 3 elements.
-      guess: guess at joint angles to achieve desired end-effector position. Numpy array of 3 elements.
-    Returns:
-      gradient of the loss function with respect to the joint angles. Numpy array of 3 elements.
-    """
-    # TODO for students: Implement this function. ~5-10 lines of code.
-    gradient = np.array([0.0, 0.0, 0.0])
-    return gradient
+    return J
 
 def calculate_inverse_kinematics(end_effector_pos, guess):
-    """Calculates joint angles given desired xyz coordinates.
+    """
+    Calculate the inverse kinematics solution using the Newton-Raphson method.
 
-    Use gradient descent to minimize the inverse kinematics loss function. The
-    joint angles that minimize the loss function are the joint angles that give 
-    the smallest error from the actual resulting end-effector position to the
-    desired end-effector position. 
-    
-    1. Calculate the gradient of the loss function with respect to the joint angles using finite 
-    difference method
-    2. Use Newton's method to update the joint angles
-    3. Repeat steps 1 and 2 until the loss is below TOLERANCE (defined above)
+    This function iteratively refines a guess for joint angles to achieve a desired end-effector position.
+    It uses the Newton-Raphson method along with a finite difference Jacobian to find the solution.
 
     Args:
-      end_effector_pos: Desired xyz coordinates of end-effector. Numpy array of 3 elements.
-      guess: Guess at joint angles that achieve desired end-effector position. Numpy array of 3 elements.
-      This is our previous ik estimate of joint angles
+        end_effector_pos (numpy.ndarray): The desired XYZ coordinates of the end-effector.
+            A numpy array with 3 elements.
+        guess (numpy.ndarray): The initial guess for joint angles. A numpy array with 3 elements.
+
     Returns:
-      Joint angles that correspond to given desired end-effector position. Numpy array with 3 elements.
-      Returns None when IK times out because the end-effector position is infeasible.
+        numpy.ndarray: The refined joint angles that achieve the desired end-effector position.
     """
-    # TODO: write a loop to iteratively update the joint angles until the loss is below TOLERANCE\
 
-    joint_angles = np.array([0.0, 0.0, 0.0])
+    # Initialize previous cost to infinity
+    previous_cost = np.inf
+    # Initialize the current cost to 0.0
+    cost = 0.0
 
-    loss = np.inf # initialize loss to infinity
+    for iters in range(MAX_ITERATIONS):
+        # Calculate the Jacobian matrix using finite differences
 
-    loss_gradient = np.array([0.0, 0.0, 0.0]) # initialize gradient
+        # Calculate the residual
 
-    iterations = 0
-    while loss > TOLERANCE and iterations < MAX_ITERATIONS:
-        # 1. recompute loss
-        # 2. use finite difference method to compute gradient of loss
-        # 3. update joint angles using newtons method
-        iterations += 1
+        # Compute the step to update the joint angles using the Moore-Penrose pseudoinverse using numpy.linalg.pinv
 
-    return joint_angles
+        # Take a full Newton step to update the guess for joint angles
+        cost = # Add your solution here.
+        # Calculate the cost based on the updated guess
+        if abs(previous_cost - cost) < TOLERANCE:
+            break
+        previous_cost = cost
+
+    return guess

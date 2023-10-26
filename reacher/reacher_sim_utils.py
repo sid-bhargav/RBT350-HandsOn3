@@ -42,7 +42,7 @@ def get_param_ids(reacher_id, ik: bool = False):
 
   if ik:
     axes = [' x', ' y', ' z']
-    vals = [.06, .03, .06]
+    vals = [0.0, 0.1, 0.1]
     for i in range(len(axes)):
         param_ids.append(p.addUserDebugParameter(axes[i], -.2, .2, vals[i]))
 
@@ -55,7 +55,7 @@ def get_param_ids(reacher_id, ik: bool = False):
         param_ids.append(
             p.addUserDebugParameter(joint_name.decode("utf-8"), -math.pi/2, math.pi/2,
                                     0))
-    
+
   return param_ids
 
 

@@ -13,11 +13,12 @@ from sys import platform
 
 flags.DEFINE_bool("run_on_robot", False, "Whether to run on robot or in simulation.")
 flags.DEFINE_bool("ik"          , False, "Whether to control arms through cartesian coordinates(IK) or joint angles")
+flags.DEFINE_list("set_joint_angles", [], "List of joint angles to set at initialization.")
 FLAGS = flags.FLAGS
 
 KP = 5.0  # Amps/rad
 KD = 2.0  # Amps/(rad/s)
-MAX_CURRENT = 3.0  # Amps
+MAX_CURRENT = 3  # Amps
 
 UPDATE_DT = 0.01  # seconds
 
@@ -56,7 +57,7 @@ def main(argv):
     mode_text_id = p.addUserDebugText(f"Motor Enabled: {motor_enabled}", [0, 0, 0.2])
   def checkEnableMotors():
     nonlocal motor_enabled, mode_text_id
-    
+
     # If spacebar (key 32) is pressed and released (0b100 mask), then toggle motors on or off
     if p.getKeyboardEvents().get(32, 0) & 0b100:
       motor_enabled = not motor_enabled
@@ -72,6 +73,26 @@ def main(argv):
   counter = 0
   last_command = time.time()
   joint_angles = np.zeros(3)
+  if flags.FLAGS.set_joint_angles:
+    # first the joint angles to 0,0,0
+    for idx, joint_id in enumerate(joint_ids):
+      p.setJointMotorControl2(
+        reacher,
+        joint_id,
+        p.POSITION_CONTROL,
+        joint_angles[idx],
+        force=2.
+      )
+    joint_angles = np.array(flags.FLAGS.set_joint_angles, dtype=np.float32)
+    # Set the simulated robot to match the joint angles
+    for idx, joint_id in enumerate(joint_ids):
+      p.setJointMotorControl2(
+        reacher,
+        joint_id,
+        p.POSITION_CONTROL,
+        joint_angles[idx],
+        force=2.
+      )
 
   print("\nRobot Status:\n")
 
@@ -95,7 +116,10 @@ def main(argv):
       counter += 1
 
       # Read the slider values
-      slider_values = np.array([p.readUserDebugParameter(id) for id in param_ids])
+      try:
+        slider_values = np.array([p.readUserDebugParameter(id) for id in param_ids])
+      except:
+        pass
       if FLAGS.ik:
         xyz = slider_values
         p.resetBasePositionAndOrientation(target_sphere_id, posObj=xyz, ornObj=[0, 0, 0, 1])
@@ -107,14 +131,16 @@ def main(argv):
       if FLAGS.ik:
           ret = inverse_kinematics.calculate_inverse_kinematics(xyz, joint_angles[:3])
           if ret is not None:
-            enable = True   
+            enable = True
             # Wraps angles between -pi, pi
             joint_angles = np.arctan2(np.sin(ret), np.cos(ret))
 
             # Double check that the angles are a correct solution before sending anything to the real robot
             pos = forward_kinematics.fk_foot(joint_angles[:3])[:3,3]
-            if np.linalg.norm(np.asarray(pos) - xyz) > 0.01:
+            if np.linalg.norm(np.asarray(pos) - xyz) > 0.05:
               joint_angles = np.zeros_like(joint_angles)
+              if flags.FLAGS.set_joint_angles:
+                joint_angles = np.array(flags.FLAGS.set_joint_angles, dtype=np.float32)
               print("Prevented operation on real robot as inverse kinematics solution was not correct")
 
       # If real-to-sim, update the joint angles based on the actual robot joint angles
