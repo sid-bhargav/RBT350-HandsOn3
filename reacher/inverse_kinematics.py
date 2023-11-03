@@ -85,7 +85,7 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
         # Compute the step to update the joint angles using the Moore-Penrose pseudoinverse using numpy.linalg.pinv
 
         # Take a full Newton step to update the guess for joint angles
-        cost = # Add your solution here.
+        # cost = # Add your solution here.
         # Calculate the cost based on the updated guess
         if abs(previous_cost - cost) < TOLERANCE:
             break
