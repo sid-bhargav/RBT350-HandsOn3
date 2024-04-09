@@ -93,7 +93,7 @@ def fk_shoulder(joint_angles):
     
     T_hip = fk_hip(joint_angles)
     # Shoulder is a translation along the Y-axis from the hip, then rotation about the new Y-axis
-    T_shoulder = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[1], np.array([0, 0, HIP_OFFSET]))
+    T_shoulder = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[1], np.array([0, -HIP_OFFSET, 0]))
     return T_hip @ T_shoulder
 
 
