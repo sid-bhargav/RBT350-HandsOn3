@@ -31,15 +31,14 @@ def rotation_matrix(axis, angle):
     x, y, z = axis
 
     # Construct the rotation matrix
-    rotation_matrix = np.array(
+    rot_mat = np.array(
         [
             [t * x * x + c, t * x * y - z * s, t * x * z + y * s],
             [t * x * y + z * s, t * y * y + c, t * y * z - x * s],
             [t * x * z - y * s, t * y * z + x * s, t * z * z + c],
         ]
     )
-
-    rot_mat = np.eye(3)
+    
     return rot_mat
 
 
