@@ -39,8 +39,8 @@ def rotation_matrix(axis, angle):
         ]
     )
 
-  rot_mat = np.eye(3)
-  return rot_mat
+    rot_mat = np.eye(3)
+    return rot_mat
 
 
 def homogenous_transformation_matrix(axis, angle, v_A):
@@ -56,8 +56,8 @@ def homogenous_transformation_matrix(axis, angle, v_A):
     4x4 transformation matrix as a numpy array
   """
 
-  T = np.eye(4)
-  return T
+    T = np.eye(4)
+    return T
 
 
 def fk_hip(joint_angles):
@@ -72,8 +72,8 @@ def fk_hip(joint_angles):
     4x4 matrix representing the pose of the hip frame in the base frame
   """
 
-  hip_frame = np.eye(4)  # remove this line when you write your solution
-  return hip_frame
+    hip_frame = np.eye(4)  # remove this line when you write your solution
+    return hip_frame
 
 
 def fk_shoulder(joint_angles):
@@ -89,11 +89,11 @@ def fk_shoulder(joint_angles):
   """
 
   # remove these lines when you write your solution
-  default_sphere_location = np.array([[0.15, 0.0, -0.1]])
-  shoulder_frame = np.block(
-    [[np.eye(3), default_sphere_location.T], 
-     [0, 0, 0, 1]])
-  return shoulder_frame
+    default_sphere_location = np.array([[0.15, 0.0, -0.1]])
+    shoulder_frame = np.block(
+      [[np.eye(3), default_sphere_location.T], 
+      [0, 0, 0, 1]])
+    return shoulder_frame
 
 
 def fk_elbow(joint_angles):
@@ -109,11 +109,11 @@ def fk_elbow(joint_angles):
   """
 
   # remove these lines when you write your solution
-  default_sphere_location = np.array([[0.15, 0.1, -0.1]])
-  elbow_frame = np.block(
-    [[np.eye(3), default_sphere_location.T], 
-     [0, 0, 0, 1]])
-  return elbow_frame
+    default_sphere_location = np.array([[0.15, 0.1, -0.1]])
+    elbow_frame = np.block(
+      [[np.eye(3), default_sphere_location.T], 
+      [0, 0, 0, 1]])
+    return elbow_frame
 
 
 def fk_foot(joint_angles):
@@ -129,8 +129,8 @@ def fk_foot(joint_angles):
   """
 
   # remove these lines when you write your solution
-  default_sphere_location = np.array([[0.15, 0.2, -0.1]])
-  end_effector_frame = np.block(
-    [[np.eye(3), default_sphere_location.T], 
-     [0, 0, 0, 1]])
-  return end_effector_frame
+    default_sphere_location = np.array([[0.15, 0.2, -0.1]])
+    end_effector_frame = np.block(
+      [[np.eye(3), default_sphere_location.T], 
+      [0, 0, 0, 1]])
+    return end_effector_frame
