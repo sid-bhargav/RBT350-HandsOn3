@@ -59,6 +59,7 @@ def homogenous_transformation_matrix(axis, angle, v_A):
     T = np.eye(4)
     T[:3, :3] = R
     T[:3, 3] = v_A
+    T[3, 3] = 1
     return T
 
 
@@ -92,7 +93,7 @@ def fk_shoulder(joint_angles):
     
     T_hip = fk_hip(joint_angles)
     # Shoulder is a translation along the Y-axis from the hip, then rotation about the new Y-axis
-    T_shoulder = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[1], np.array([HIP_OFFSET, 0, 0]))
+    T_shoulder = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[1], np.array([0, 0, HIP_OFFSET]))
     return T_hip @ T_shoulder
 
 
@@ -110,7 +111,7 @@ def fk_elbow(joint_angles):
     
     T_shoulder = fk_shoulder(joint_angles)
     # Elbow is a translation along the Y-axis from the shoulder, then rotation about the new Y-axis
-    T_elbow = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[2], np.array([UPPER_LEG_OFFSET, 0, 0]))
+    T_elbow = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[2], np.array([0, 0, UPPER_LEG_OFFSET]))
     return T_shoulder @ T_elbow
 
 
@@ -128,5 +129,5 @@ def fk_foot(joint_angles):
 
     T_elbow = fk_elbow(joint_angles)
     # Foot is a translation along the Y-axis from the elbow
-    T_foot = homogenous_transformation_matrix(np.array([0, 0, 1]), 0, np.array([LOWER_LEG_OFFSET, 0, 0]))
+    T_foot = homogenous_transformation_matrix(np.array([0, 0, 1]), 0, np.array([0, 0, LOWER_LEG_OFFSET]))
     return T_elbow @ T_foot
