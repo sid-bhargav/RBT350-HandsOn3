@@ -51,11 +51,14 @@ def homogenous_transformation_matrix(axis, angle, v_A):
       angle: Number. The amount to rotate about the axis in radians
       v_A:   Vector. The vector translation from A to B defined in frame A
 
-    Returns:
-      4x4 transformation matrix as a numpy array
-    """
+  Returns:
+    4x4 transformation matrix as a numpy array
+  """
 
+    R = rotation_matrix(axis, angle)
     T = np.eye(4)
+    T[:3, :3] = R
+    T[:3, 3] = v_A
     return T
 
 
@@ -64,15 +67,15 @@ def fk_hip(joint_angles):
     Use forward kinematics equations to calculate the xyz coordinates of the hip
     frame given the joint angles of the robot
 
-    Args:
-      joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle,
-                    elbow_angle]. Angles are in radians
-    Returns:
-      4x4 matrix representing the pose of the hip frame in the base frame
-    """
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    4x4 matrix representing the pose of the hip frame in the base frame
+  """
 
-    hip_frame = np.eye(4)  # remove this line when you write your solution
-    return hip_frame
+    T_hip = homogenous_transformation_matrix(np.array([0, 0, 1]), joint_angles[0], np.array([0, 0, 0]))
+    return T_hip
 
 
 def fk_shoulder(joint_angles):
@@ -80,17 +83,17 @@ def fk_shoulder(joint_angles):
     Use forward kinematics equations to calculate the xyz coordinates of the shoulder
     joint given the joint angles of the robot
 
-    Args:
-      joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle,
-                    elbow_angle]. Angles are in radians
-    Returns:
-      4x4 matrix representing the pose of the shoulder frame in the base frame
-    """
-
-    # remove these lines when you write your solution
-    default_sphere_location = np.array([[0.15, 0.0, -0.1]])
-    shoulder_frame = np.block([[np.eye(3), default_sphere_location.T], [0, 0, 0, 1]])
-    return shoulder_frame
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    4x4 matrix representing the pose of the shoulder frame in the base frame
+  """
+    
+    T_hip = fk_hip(joint_angles)
+    # Shoulder is a translation along the Y-axis from the hip, then rotation about the new Y-axis
+    T_shoulder = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[1], np.array([HIP_OFFSET, 0, 0]))
+    return T_hip @ T_shoulder
 
 
 def fk_elbow(joint_angles):
@@ -98,17 +101,17 @@ def fk_elbow(joint_angles):
     Use forward kinematics equations to calculate the xyz coordinates of the elbow
     joint given the joint angles of the robot
 
-    Args:
-      joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle,
-                    elbow_angle]. Angles are in radians
-    Returns:
-      4x4 matrix representing the pose of the elbow frame in the base frame
-    """
-
-    # remove these lines when you write your solution
-    default_sphere_location = np.array([[0.15, 0.1, -0.1]])
-    elbow_frame = np.block([[np.eye(3), default_sphere_location.T], [0, 0, 0, 1]])
-    return elbow_frame
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    4x4 matrix representing the pose of the elbow frame in the base frame
+  """
+    
+    T_shoulder = fk_shoulder(joint_angles)
+    # Elbow is a translation along the Y-axis from the shoulder, then rotation about the new Y-axis
+    T_elbow = homogenous_transformation_matrix(np.array([0, 1, 0]), joint_angles[2], np.array([UPPER_LEG_OFFSET, 0, 0]))
+    return T_shoulder @ T_elbow
 
 
 def fk_foot(joint_angles):
@@ -116,16 +119,14 @@ def fk_foot(joint_angles):
     Use forward kinematics equations to calculate the xyz coordinates of the foot given
     the joint angles of the robot
 
-    Args:
-      joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle,
-                    elbow_angle]. Angles are in radians
-    Returns:
-      4x4 matrix representing the pose of the end effector frame in the base frame
-    """
+  Args:
+    joint_angles: numpy array of 3 elements stored in the order [hip_angle, shoulder_angle, 
+                  elbow_angle]. Angles are in radians
+  Returns:
+    4x4 matrix representing the pose of the end effector frame in the base frame
+  """
 
-    # remove these lines when you write your solution
-    default_sphere_location = np.array([[0.15, 0.2, -0.1]])
-    end_effector_frame = np.block(
-        [[np.eye(3), default_sphere_location.T], [0, 0, 0, 1]]
-    )
-    return end_effector_frame
+    T_elbow = fk_elbow(joint_angles)
+    # Foot is a translation along the Y-axis from the elbow
+    T_foot = homogenous_transformation_matrix(np.array([0, 0, 1]), 0, np.array([LOWER_LEG_OFFSET, 0, 0]))
+    return T_elbow @ T_foot
