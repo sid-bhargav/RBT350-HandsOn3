@@ -30,9 +30,11 @@ def ik_cost(end_effector_pos, guess):
     """
     # Initialize cost to zero
     cost = 0.0
+    
+    guess_pos = forward_kinematics.fk_foot(guess)[:3, 3]
 
     # Calculate the Euclidean distance
-    cost = np.linalg.norm(guess - end_effector_pos)
+    cost = np.linalg.norm(guess_pos - end_effector_pos)
 
     return cost
 
@@ -52,17 +54,21 @@ def calculate_jacobian_FD(joint_angles, delta):
         between joint velocity and end-effector linear velocity.
     """
 
-    # Initialize Jacobian to zero
+# Initialize Jacobian to zero
     J = np.zeros((3, 3))
-    
-    # Find end effector positions
-    pos_initial = forward_kinematics.fk_foot(joint_angles) # Initial
-    pos_final = forward_kinematics.fk_foot(joint_angles + np.full((3,), delta)) # After perturbation
-
-    # Calculate the Jacobian using finite differences
     for i in range(3):
-        # Compute the finite difference approximation for the i-th column of the Jacobian
-        J[:, i] = (pos_final[:3,3] - pos_initial[:3,3]) / delta
+        # Perturb joint angle i
+        perturbed_angles = np.copy(joint_angles)
+        perturbed_angles[i] += delta
+        
+        # Calculate end-effector position with perturbed joint angle
+        perturbed_pos = forward_kinematics.fk_foot(perturbed_angles)[:3, 3]
+        
+        # Calculate original end-effector position for comparison
+        original_pos = forward_kinematics.fk_foot(joint_angles) [:3, 3]
+        
+        # Approximate derivative (column of the Jacobian)
+        J[:, i] = (perturbed_pos - original_pos) / delta
 
     return J
 
@@ -92,16 +98,19 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
         J = calculate_jacobian_FD(guess, delta=PERTURBATION)
 
         # Calculate the residual
-        residual = end_effector_pos - forward_kinematics.fk_foot(guess)[:3,3]
+        residual = end_effector_pos - forward_kinematics.fk_foot(guess)[:3, 3]
+        print("residual: ", residual)
 
         # Compute the step to update the joint angles using the Moore-Penrose pseudoinverse using numpy.linalg.pinv
         step = np.linalg.pinv(J) @ residual
+        print("step: ", step)
 
         # Take a full Newton step to update the guess for joint angles
         guess += step
 
         cost = ik_cost(end_effector_pos, guess)
-
+        print("cost: ", cost)
+    
         # Calculate the cost based on the updated guess
         if abs(previous_cost - cost) < TOLERANCE:
             break
@@ -113,7 +122,7 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
 def main():
     delta = 0.1
     angles = [0, 0, 0]
-    print(calculate_inverse_kinematics([-0.110,-0.078, -0.171], [0, 0, 0]))
+    print(calculate_inverse_kinematics([0.06, 0.15, 0.15], [0, 0, 0]))
 
 if __name__ == "__main__":
     main()
