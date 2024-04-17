@@ -31,7 +31,8 @@ def ik_cost(end_effector_pos, guess):
     # Initialize cost to zero
     cost = 0.0
 
-    # Add your solution here.
+    # Calculate the Euclidean distance
+    cost = np.linalg.norm(guess - end_effector_pos)
 
     return cost
 
@@ -53,11 +54,17 @@ def calculate_jacobian_FD(joint_angles, delta):
 
     # Initialize Jacobian to zero
     J = np.zeros((3, 3))
+    
+    # Find end effector positions
+    pos_initial = forward_kinematics.fk_foot(joint_angles) # Initial
+    pos_final = forward_kinematics.fk_foot(joint_angles + np.full((3,), delta)) # After perturbation
 
-    # Add your solution here.
+    # Calculate the Jacobian using finite differences
+    for i in range(3):
+        # Compute the finite difference approximation for the i-th column of the Jacobian
+        J[:, i] = (pos_final[:3,3] - pos_initial[:3,3]) / delta
 
     return J
-
 
 def calculate_inverse_kinematics(end_effector_pos, guess):
     """
@@ -95,3 +102,12 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
         previous_cost = cost
 
     return guess
+
+# Testing functions
+def main():
+    delta = 0.1
+    angles = [0, 0, 0]
+    calculate_jacobian_FD(angles, delta)
+
+if __name__ == "__main__":
+    main()
