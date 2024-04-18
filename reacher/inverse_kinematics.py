@@ -31,10 +31,8 @@ def ik_cost(end_effector_pos, guess):
     # Initialize cost to zero
     cost = 0.0
     
-    guess_pos = forward_kinematics.fk_foot(guess)[:3, 3]
-
     # Calculate the Euclidean distance
-    cost = np.linalg.norm(forward_kinematics.fk_foot(guess)[:3,3] - end_effector_pos)
+    cost = np.linalg.norm(end_effector_pos - forward_kinematics.fk_foot(guess)[:3,3])
 
     return cost
 
@@ -101,17 +99,14 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
 
         # Calculate the residual
         residual = end_effector_pos - forward_kinematics.fk_foot(guess)[:3, 3]
-        print("residual: ", residual)
 
         # Compute the step to update the joint angles using the Moore-Penrose pseudoinverse using numpy.linalg.pinv
         step = np.linalg.pinv(J) @ residual
-        print("step: ", step)
 
         # Take a full Newton step to update the guess for joint angles
         guess = guess + step
 
         cost = ik_cost(end_effector_pos, guess)
-        print("cost: ", cost)
     
         # Calculate the cost based on the updated guess
         if abs(previous_cost - cost) < TOLERANCE:
@@ -119,12 +114,3 @@ def calculate_inverse_kinematics(end_effector_pos, guess):
         previous_cost = cost
 
     return guess
-
-# Testing functions
-def main():
-    delta = 0.1
-    angles = [0, 0, 0]
-    print(calculate_inverse_kinematics([0.06, 0.15, 0.15], [0, 0, 0]))
-
-if __name__ == "__main__":
-    main()
