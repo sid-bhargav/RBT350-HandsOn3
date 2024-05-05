@@ -13,20 +13,25 @@ def main():
         if not conn:
             break
 
-        # Convert the frame to HSV color space
+        # Chnage from rgb to hsv colorspace 
+        # better for detecting a red hue rather than red color value
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         # Define the range of red color in HSV
         lower_red = np.array([0, 120, 70])
         upper_red = np.array([5, 255, 255])
-        mask1 = cv2.inRange(hsv, lower_red, upper_red)
+        lower_red_hues = cv2.inRange(hsv, lower_red, upper_red)
 
         lower_red = np.array([175, 120, 70])
         upper_red = np.array([180, 255, 255])
-        mask2 = cv2.inRange(hsv, lower_red, upper_red)
+        upper_red_hues = cv2.inRange(hsv, lower_red, upper_red)
 
-        # Combine masks for red color
-        mask = mask1 + mask2
+        # Combine masks for red hues
+        mask = upper_red_hues
+
+        # filter the frame for only the masked red pixels
+        output_hsv = frame
+        output_hsv[np.where(mask==0)] = 0
 
         # Find contours in the mask
         contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -48,11 +53,10 @@ def main():
                     center = (int(x), int(y))
                     radius = int(radius)
                     # Draw the circle
-                    cv2.circle(frame, center, radius, (0, 255, 0), 2)
-
+                    cv2.circle(output_hsv, center, radius, (0, 255, 0), 2)
 
         # Display the result
-        cv2.imshow('Red Dot Tracker', frame)
+        cv2.imshow('Red Dot Tracker', output_hsv)
 
         # Break the loop when 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
