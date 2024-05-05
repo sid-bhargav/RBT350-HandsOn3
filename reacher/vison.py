@@ -51,6 +51,7 @@ def main():
                     # Calculate bounding circle
                     (x, y), radius = cv2.minEnclosingCircle(contour)
                     center = (int(x), int(y))
+                    print(center)
                     radius = int(radius)
                     # Draw the circle
                     cv2.circle(output_hsv, center, radius, (0, 255, 0), 2)
