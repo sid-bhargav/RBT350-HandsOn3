@@ -5,6 +5,9 @@ def main():
     # Start capturing video from the webcam
     cap = cv2.VideoCapture(0)
 
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1080)
+
     while True:
         # Get video frame
         conn, frame = cap.read()
@@ -31,7 +34,7 @@ def main():
 
         # filter the frame for only the masked red pixels
         output_hsv = frame
-        output_hsv[np.where(mask==0)] = 0
+        # output_hsv[np.where(mask==0)] = 0
 
         # Find contours in the mask
         contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
