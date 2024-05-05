@@ -19,15 +19,15 @@ def main():
 
         # Define the range of red color in HSV
         lower_red = np.array([0, 120, 70])
-        upper_red = np.array([5, 255, 255])
+        upper_red = np.array([1, 255, 255])
         lower_red_hues = cv2.inRange(hsv, lower_red, upper_red)
 
-        lower_red = np.array([175, 120, 70])
+        lower_red = np.array([170, 120, 70])
         upper_red = np.array([180, 255, 255])
         upper_red_hues = cv2.inRange(hsv, lower_red, upper_red)
 
         # Combine masks for red hues
-        mask = upper_red_hues
+        mask = lower_red_hues + upper_red_hues
 
         # filter the frame for only the masked red pixels
         output_hsv = frame
@@ -47,7 +47,7 @@ def main():
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 # Threshold for circularity can be adjusted, closer to 1 is perfect circle
-                if circularity > 0.7:  # Adjust circularity threshold as needed
+                if circularity > 0.75:  # Adjust circularity threshold as needed
                     # Calculate bounding circle
                     (x, y), radius = cv2.minEnclosingCircle(contour)
                     center = (int(x), int(y))
