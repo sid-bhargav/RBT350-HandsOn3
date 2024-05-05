@@ -1,12 +1,42 @@
 import cv2
 import numpy as np
+import pickle
+
+def cv2_undistortPoints(uSrc, vSrc, cameraMatrix, distCoeffs):
+    uvSrc = np.array([np.matrix([uSrc, vSrc]).transpose()], dtype="float32")
+    uvDst = cv2.undistortPoints(uvSrc, cameraMatrix, distCoeffs, None, cameraMatrix)
+    uDst = [uv[0] for uv in uvDst[0]]
+    vDst = [uv[1] for uv in uvDst[0]]
+    return uDst, vDst
+
+def uv_to_xy(center, cameraMatrix, distCoeffs):
+    # Understort points u, v
+    uDst, vDst = cv2_undistortPoints(center[0], center[1], cameraMatrix, distCoeffs)
+
+    # Construct 3D point in homogeneous coordinates
+    uv_point = np.array([uDst, vDst, [1]])
+
+    print(uv_point)
+
+    z = 24.5 #mm
+
+    xy_point = np.dot(np.linalg.inv(cameraMatrix), uv_point)
+    xy_point = xy_point * (z)
+    
+    return (float(xy_point[0]), float(xy_point[1]))
 
 def main():
+
+    # Read calibration data
+    with open('./calibration_sid.pckl', 'rb') as f:
+        data = pickle.load(f)
+
+    cameraMatrix, distCoeffs, rvecs, tvecs = data
+
+    # print(uv_to_xy((325, 246), camera_matrix, distortion_matrix))
+
     # Start capturing video from the webcam
     cap = cv2.VideoCapture(0)
-
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1080)
 
     while True:
         # Get video frame
@@ -58,6 +88,7 @@ def main():
                     radius = int(radius)
                     # Draw the circle
                     cv2.circle(output_hsv, center, radius, (0, 255, 0), 2)
+                    cv2.putText(output_hsv, str(uv_to_xy(center, cameraMatrix, distCoeffs)), center, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         # Display the result
         cv2.imshow('Red Dot Tracker', output_hsv)
