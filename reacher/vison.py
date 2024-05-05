@@ -6,10 +6,11 @@ def main():
     cap = cv2.VideoCapture(0)
 
     while True:
-        # Read a frame from the video capture
-        ret, frame = cap.read()
+        # Get video frame
+        conn, frame = cap.read()
 
-        if not ret:
+        # check if camera is connected
+        if not conn:
             break
 
         # Convert the frame to HSV color space
@@ -17,10 +18,10 @@ def main():
 
         # Define the range of red color in HSV
         lower_red = np.array([0, 120, 70])
-        upper_red = np.array([10, 255, 255])
+        upper_red = np.array([5, 255, 255])
         mask1 = cv2.inRange(hsv, lower_red, upper_red)
 
-        lower_red = np.array([170, 120, 70])
+        lower_red = np.array([175, 120, 70])
         upper_red = np.array([180, 255, 255])
         mask2 = cv2.inRange(hsv, lower_red, upper_red)
 
@@ -30,12 +31,25 @@ def main():
         # Find contours in the mask
         contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Draw bounding circles around detected contours
+        # Process each contour
         for contour in contours:
             area = cv2.contourArea(contour)
+            # Filter small areas to reduce noise
             if area > 100:
-                x, y, w, h = cv2.boundingRect(contour)
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                # Calculate circularity to identify dots
+                perimeter = cv2.arcLength(contour, True)
+                if perimeter == 0:
+                    continue
+                circularity = 4 * np.pi * (area / (perimeter * perimeter))
+                # Threshold for circularity can be adjusted, closer to 1 is perfect circle
+                if circularity > 0.7:  # Adjust circularity threshold as needed
+                    # Calculate bounding circle
+                    (x, y), radius = cv2.minEnclosingCircle(contour)
+                    center = (int(x), int(y))
+                    radius = int(radius)
+                    # Draw the circle
+                    cv2.circle(frame, center, radius, (0, 255, 0), 2)
+
 
         # Display the result
         cv2.imshow('Red Dot Tracker', frame)
