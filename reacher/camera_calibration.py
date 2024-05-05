@@ -5,6 +5,11 @@
 # - OpenCV-Python tutorial for calibration: http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html
 #   - Variable names were changed for clarity
 
+
+#2D to 3D Corner Mapping
+# ( 27, 447) --> ( 10.2, 8.8, 18.8) inches
+# (584, 439) --> (-10.2, 8.8, 18.8) inches
+
 import numpy
 import cv2
 import pickle
