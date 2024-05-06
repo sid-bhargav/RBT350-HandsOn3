@@ -2,10 +2,13 @@ from reacher import forward_kinematics
 from reacher import inverse_kinematics
 from reacher import reacher_robot_utils
 from reacher import reacher_sim_utils
+from reacher import vision
 import pybullet as p
 import time
 import contextlib
 import numpy as np
+import pickle
+import cv2
 from absl import app
 from absl import flags
 from pupper_hardware_interface import interface
@@ -30,6 +33,7 @@ L2 = 0.11  # meters
 def main(argv):
   run_on_robot = FLAGS.run_on_robot
   reacher = reacher_sim_utils.load_reacher()
+  position = [0.1, 0.1, 0.1]
 
   # Sphere markers for the students' FK solutions
   shoulder_sphere_id = reacher_sim_utils.create_debug_sphere([1, 0, 0, 1])
@@ -96,8 +100,78 @@ def main(argv):
 
   print("\nRobot Status:\n")
 
+  # Read calibration data
+  with open('./calibration_sid.pckl', 'rb') as f:
+    data = pickle.load(f)
+
+  cameraMatrix, distCoeffs, rvecs, tvecs = data
+
+  # print(uv_to_xy((325, 246), camera_matrix, distortion_matrix))
+
+  # Start capturing video from the webcam
+  cap = cv2.VideoCapture(0)
+
   # Main loop
   while (True):
+
+    # Get video frame
+    conn, frame = cap.read()
+
+    # check if camera is connected
+    if not conn:
+      break
+
+    # Chnage from rgb to hsv colorspace 
+    # better for detecting a red hue rather than red color value
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # Define the range of red color in HSV
+    lower_red = np.array([0, 120, 70])
+    upper_red = np.array([1, 255, 255])
+    lower_red_hues = cv2.inRange(hsv, lower_red, upper_red)
+
+    lower_red = np.array([170, 120, 70])
+    upper_red = np.array([180, 255, 255])
+    upper_red_hues = cv2.inRange(hsv, lower_red, upper_red)
+
+    # Combine masks for red hues
+    mask = lower_red_hues + upper_red_hues
+
+    # filter the frame for only the masked red pixels
+    output_hsv = frame
+    # output_hsv[np.where(mask==0)] = 0
+
+    # Find contours in the mask
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Process each contour
+    for contour in contours:
+      area = cv2.contourArea(contour)
+      # Filter small areas to reduce noise
+      if area > 100:
+        # Calculate circularity to identify dots
+        perimeter = cv2.arcLength(contour, True)
+        if perimeter == 0:
+          continue
+        circularity = 4 * np.pi * (area / (perimeter * perimeter))
+        # Threshold for circularity can be adjusted, closer to 1 is perfect circle
+        if circularity > 0.75:  # Adjust circularity threshold as needed
+          # Calculate bounding circle
+          (x, y), radius = cv2.minEnclosingCircle(contour)
+          center = (int(x), int(y))
+          print(center)
+          radius = int(radius)
+          # Draw the circle
+          cv2.circle(output_hsv, center, radius, (0, 255, 0), 2)
+          position = vision.CF_to_BF(vision.uv_to_xy(center, cameraMatrix, distCoeffs))
+          cv2.putText(output_hsv, str(position), center, cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 0), 1)
+
+    # Display the result
+    cv2.imshow('Red Dot Tracker', output_hsv)
+
+    # Break the loop when 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+      break
 
     # Whether or not to send commands to the real robot
     enable = False
@@ -121,7 +195,7 @@ def main(argv):
       except:
         pass
       if FLAGS.ik:
-        xyz = slider_values
+        xyz = position
         p.resetBasePositionAndOrientation(target_sphere_id, posObj=xyz, ornObj=[0, 0, 0, 1])
       else:
         joint_angles = slider_values
@@ -181,5 +255,9 @@ def main(argv):
       # Show the result in the terminal
       if counter % 20 == 0:
         print(f"\rJoint angles: [{', '.join(f'{q: .3f}' for q in joint_angles[:3])}] | Position: ({', '.join(f'{p: .3f}' for p in foot_pos)})", end='')
+
+  # Release the video capture object and close all OpenCV windows
+  cap.release()
+  cv2.destroyAllWindows()
 
 app.run(main)

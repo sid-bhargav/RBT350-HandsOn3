@@ -41,6 +41,8 @@ images = glob.glob('./reacher/images/sid/*.png')
 # All images used should be the same size, which if taken with the same camera shouldn't be a problem
 imageSize = None # Determined at runtime
 
+img_counter = 0
+
 # Loop through images glob'ed
 for iname in images:
     # Open the image
@@ -74,6 +76,9 @@ for iname in images:
         img = cv2.drawChessboardCorners(img, (CHESSBOARD_CORNERS_ROWCOUNT, CHESSBOARD_CORNERS_COLCOUNT), corners_acc, board)
         # Pause to display each image, waiting for key press
         cv2.imshow('Chessboard', img)
+        img_name = "calibration_chessboard_{}.png".format(img_counter)
+        img_counter += 1
+        cv2.imwrite(img_name, img)
         cv2.waitKey(0)
     else:
         print("Not able to detect a chessboard in image: {}".format(iname))

@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import pickle
 
+Z_DISPLACEMENT = 0.40 #cm
+
 def cv2_undistortPoints(uSrc, vSrc, cameraMatrix, distCoeffs):
     uvSrc = np.array([np.matrix([uSrc, vSrc]).transpose()], dtype="float32")
     uvDst = cv2.undistortPoints(uvSrc, cameraMatrix, distCoeffs, None, cameraMatrix)
@@ -18,12 +20,21 @@ def uv_to_xy(center, cameraMatrix, distCoeffs):
 
     print(uv_point)
 
-    z = 24.5 #mm
-
     xy_point = np.dot(np.linalg.inv(cameraMatrix), uv_point)
-    xy_point = xy_point * (z)
+    xy_point = xy_point * (Z_DISPLACEMENT)
     
-    return (float(xy_point[0]), float(xy_point[1]))
+    return (round(float(xy_point[0]), 3), round(float(xy_point[1]), 3))
+
+# Takes 2D point
+def CF_to_BF(point):
+    point_CF = np.array([point[0], point[1], Z_DISPLACEMENT, 1]).transpose()
+    transform = np.array([[0, 0, -1, .545],
+                      [1, 0, 0, 0],
+                      [0, -1, 0, .175],
+                      [0, 0, 0, 1]])
+    point_BF = np.dot(transform, point_CF)
+
+    return [point_BF[0], point_BF[1], point_BF[2]]
 
 def main():
 
@@ -88,7 +99,7 @@ def main():
                     radius = int(radius)
                     # Draw the circle
                     cv2.circle(output_hsv, center, radius, (0, 255, 0), 2)
-                    cv2.putText(output_hsv, str(uv_to_xy(center, cameraMatrix, distCoeffs)), center, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    cv2.putText(output_hsv, str(CF_to_BF(uv_to_xy(center, cameraMatrix, distCoeffs))), center, cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 0), 1)
 
         # Display the result
         cv2.imshow('Red Dot Tracker', output_hsv)
